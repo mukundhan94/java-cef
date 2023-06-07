@@ -8,41 +8,25 @@ import org.cef.CefApp;
 import org.cef.CefApp.CefVersion;
 import org.cef.CefClient;
 import org.cef.CefSettings;
-import org.cef.CefSettings.ColorType;
-import org.cef.OS;
 import org.cef.browser.CefBrowser;
+import org.cef.browser.CefBrowserWr;
 import org.cef.browser.CefFrame;
 import org.cef.browser.CefMessageRouter;
-import org.cef.browser.CefRequestContext;
 import org.cef.handler.CefDisplayHandlerAdapter;
 import org.cef.handler.CefFocusHandlerAdapter;
 import org.cef.handler.CefLoadHandlerAdapter;
-import org.cef.handler.CefRequestContextHandlerAdapter;
 import org.cef.network.CefCookieManager;
-
-import java.awt.BorderLayout;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.io.File;
-import java.lang.Thread.UncaughtExceptionHandler;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import tests.detailed.dialog.DownloadDialog;
-import tests.detailed.handler.AppHandler;
-import tests.detailed.handler.ContextMenuHandler;
-import tests.detailed.handler.DragHandler;
-import tests.detailed.handler.JSDialogHandler;
-import tests.detailed.handler.KeyboardHandler;
-import tests.detailed.handler.MessageRouterHandler;
-import tests.detailed.handler.MessageRouterHandlerEx;
-import tests.detailed.handler.RequestHandler;
+import tests.detailed.handler.*;
 import tests.detailed.ui.ControlPanel;
 import tests.detailed.ui.MenuBar;
 import tests.detailed.ui.StatusPanel;
 import tests.detailed.util.DataUri;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class MainFrame extends BrowserFrame {
     private static final long serialVersionUID = -2295538706810864538L;
@@ -201,7 +185,7 @@ public class MainFrame extends BrowserFrame {
         });
 
         // Create the browser.
-        CefBrowser browser = client_.createBrowser(
+        CefBrowserWr browser = client_.createBrowser(
                 "http://www.google.com", osrEnabled, transparentPaintingEnabled, null);
         setBrowser(browser);
 

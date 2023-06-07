@@ -9,53 +9,33 @@ import org.cef.OS;
 import org.cef.handler.CefWindowHandler;
 import org.cef.handler.CefWindowHandlerAdapter;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
-
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.MenuSelectionManager;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.ToolTipManager;
 
 /**
  * This class represents a windowed rendered browser.
  * The visibility of this class is "package". To create a new
  * CefBrowser instance, please use CefBrowserFactory.
  */
-class CefBrowserWr extends CefBrowser_N {
+public class CefBrowserWr extends CefBrowser_N {
     private Canvas canvas_ = null;
     private Component component_ = null;
     private Rectangle content_rect_ = new Rectangle(0, 0, 0, 0);
     private long window_handle_ = 0;
     private boolean justCreated_ = false;
     private double scaleFactor_ = 1.0;
-    private Timer delayedUpdate_ = new Timer(100, new ActionListener() {
+    private boolean isPaused = false;
+
+    int count = 0;
+    private Timer delayedUpdate_ = new Timer(500, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            int c = count;
+            count++;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -71,7 +51,8 @@ class CefBrowserWr extends CefBrowser_N {
                         // {...}.paint(Graphics)). If on Linux, this is needed to invoke an
                         // XMoveResizeWindow call shortly after the UI was created. That seems to be
                         // necessary to actually get a windowed renderer to display something.
-                        if (OS.isMacintosh() || OS.isLinux()) doUpdate();
+                        System.out.println("count " + c);
+//                        if (OS.isMacintosh() || OS.isLinux()) doUpdate();
                     }
                 }
             });
@@ -347,8 +328,20 @@ class CefBrowserWr extends CefBrowser_N {
         return 0;
     }
 
-    private void doUpdate() {
-        if (isClosed()) return;
+    public void pauseUpdate() {
+        this.isPaused = true;
+    }
+
+    public void resumeUpdate() {
+        this.isPaused = false;
+    }
+
+    boolean isPaused() {
+        return isPaused;
+    }
+
+    public void doUpdate() {
+        if (isClosed() || isPaused()) return;
 
         Rectangle vr = ((JPanel) component_).getVisibleRect();
         Rectangle clipping = new Rectangle((int) (vr.getX() * scaleFactor_),
@@ -372,9 +365,15 @@ class CefBrowserWr extends CefBrowser_N {
             browserPos.y *= -1;
 
             synchronized (content_rect_) {
+                System.out.println("clipping: width " + clipping.getSize().width + " height " + clipping.getSize().height);
+                System.out.println("component: width " + component_.getSize().width + " height" + component_.getSize().height);
+                System.out.println("contentPos: width " + contentPos.x + " height " + contentPos.y);
                 content_rect_ = new Rectangle(contentPos, clipping.getSize());
                 Rectangle browserRect = new Rectangle(browserPos, component_.getSize());
+                System.out.println("content_rect_ 11" + content_rect_);
+                System.out.println("browserRect_ 11" + browserRect);
                 updateUI(content_rect_, browserRect);
+                System.out.println("browserRect: width " + browserRect.x + " height " + browserRect.y);
             }
         } else {
             synchronized (content_rect_) {
@@ -420,5 +419,13 @@ class CefBrowserWr extends CefBrowser_N {
     @Override
     public CompletableFuture<BufferedImage> createScreenshot(boolean nativeResolution) {
         throw new UnsupportedOperationException("Unsupported for windowed rendering");
+    }
+
+    public void wasResized(int width, int height) {
+        super.wasResized(width, height);
+    }
+
+    public void updateUI(Rectangle contentRect, Rectangle browserRect) {
+        super.updateUI(contentRect, browserRect);
     }
 }

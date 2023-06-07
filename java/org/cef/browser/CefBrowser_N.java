@@ -5,12 +5,7 @@
 package org.cef.browser;
 
 import org.cef.CefClient;
-import org.cef.browser.CefRequestContext;
-import org.cef.callback.CefDragData;
-import org.cef.callback.CefNativeAdapter;
-import org.cef.callback.CefPdfPrintCallback;
-import org.cef.callback.CefRunFileDialogCallback;
-import org.cef.callback.CefStringVisitor;
+import org.cef.callback.*;
 import org.cef.handler.CefClientHandler;
 import org.cef.handler.CefDialogHandler.FileDialogMode;
 import org.cef.handler.CefRenderHandler;
@@ -18,18 +13,13 @@ import org.cef.handler.CefWindowHandler;
 import org.cef.misc.CefPdfPrintSettings;
 import org.cef.network.CefRequest;
 
-import java.awt.Canvas;
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowEvent;
 import java.util.Vector;
-
-import javax.swing.SwingUtilities;
 
 /**
  * This class represents all methods which are connected to the
@@ -569,10 +559,11 @@ abstract class CefBrowser_N extends CefNativeAdapter implements CefBrowser {
 
     /**
      * Notify that the browser was resized.
-     * @param width The new width of the browser
+     *
+     * @param width  The new width of the browser
      * @param height The new height of the browser
      */
-    protected final void wasResized(int width, int height) {
+    protected void wasResized(int width, int height) {
         try {
             N_WasResized(width, height);
         } catch (UnsatisfiedLinkError ule) {
@@ -721,7 +712,7 @@ abstract class CefBrowser_N extends CefNativeAdapter implements CefBrowser {
         }
     }
 
-    protected final void updateUI(Rectangle contentRect, Rectangle browserRect) {
+    protected void updateUI(Rectangle contentRect, Rectangle browserRect) {
         try {
             N_UpdateUI(contentRect, browserRect);
         } catch (UnsatisfiedLinkError ule) {
